@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StatesManager : MonoBehaviour {
+[RequireComponent(typeof(Rigidbody))]
+public class StatesManager : MonoBehaviour
+{
 
-    // Todo get stats?
+    // TODO Check if not null or get the ControllerStats in init
     public ControllerStats stats;
     public ControllerStates controllerStates;
 
@@ -23,7 +25,7 @@ public class StatesManager : MonoBehaviour {
     public class ControllerStates
     {
         public bool onGround;
-        public bool isAiming; 
+        public bool isAiming;
         public bool IsFliping;
         public bool isRunning; // Disk cant run x)
     }
@@ -129,12 +131,29 @@ public class StatesManager : MonoBehaviour {
 
         Vector3 dir = Vector3.zero;
         dir = inp.moveDirection * (speed * inp.moveAmount);
-        rigid.AddForce(dir, ForceMode.Force);
+        // rigid.AddForce(dir, ForceMode.Force);
+        rigid.velocity = dir;
+
     }
+
+    private float accelerationFactor = 0;
 
     void RotationNormal() {
         rigid.maxAngularVelocity = stats.maxAngularVelocity;
-        rigid.AddTorque(Vector3.up * stats.torque * Input.GetAxis("HorizontalR"), ForceMode.Force);
+        rigid.angularDrag = stats.angularDrag;
+
+        // To simulate acceleration
+        if (Input.GetAxis("HorizontalR") != 0) {
+            accelerationFactor += stats.rotationAccelerationSpeed;
+
+            rigid.AddTorque(Vector3.up * Mathf.Lerp(0, stats.torque, accelerationFactor) * Mathf.Sign(Input.GetAxis("HorizontalR")), ForceMode.Force);
+            rigid.AddForce(Vector3.up * Mathf.Lerp(0, stats.rotationUpForce, accelerationFactor), ForceMode.Force);
+        }
+        else {
+            accelerationFactor -= stats.rotationAccelerationSpeed;
+        }
+
+        accelerationFactor = Mathf.Clamp01(accelerationFactor);
     }
 
 
@@ -162,7 +181,7 @@ public class StatesManager : MonoBehaviour {
 
     public enum CharState
     {
-        normal, onAir, shield, charging, rolling 
+        normal, onAir, shield, charging, rolling
     }
 
     //void SetupAnimator() {
