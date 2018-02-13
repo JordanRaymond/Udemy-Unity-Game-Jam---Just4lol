@@ -5,8 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class StatesManager : MonoBehaviour
 {
-
-    // TODO Check if not null or get the ControllerStats in init
+    // TODO : Check if not null or get the ControllerStats in init ( I hate feading a var through the inspector)
     public ControllerStats stats;
     public ControllerStates controllerStates;
 
@@ -43,10 +42,6 @@ public class StatesManager : MonoBehaviour
 
     public float delta;
 
-    void Start() {
-
-    }
-
     public void Init() {
         tTransform = transform;
 
@@ -69,7 +64,6 @@ public class StatesManager : MonoBehaviour
         delta = p_delta;
 
         currentState = controllerStates.IsFliping ? CharState.rolling : CharState.normal;
-
         //if (controllerStates.IsFliping) {
         //    ToRollState();
         //}
@@ -83,6 +77,8 @@ public class StatesManager : MonoBehaviour
                 else {
                     RotationNormal();
                     MovementNormal();
+                    Hovering();
+
                 }
 
                 break;
@@ -118,12 +114,13 @@ public class StatesManager : MonoBehaviour
         }
     }
 
+    // Need a rework so it can work with the wipout controlls
     void ToRollState() {
         // rigid.AddForce(Vector3.up * stats.jumpTrust, ForceMode.Impulse);
     }
 
     void MovementNormal() {
-
+        // TODO : Acceleration?
         float speed = stats.moveSpeed;
         if (controllerStates.isRunning) {
             speed = stats.boostSpeed;
@@ -131,13 +128,12 @@ public class StatesManager : MonoBehaviour
 
         Vector3 dir = Vector3.zero;
         dir = inp.moveDirection * (speed * inp.moveAmount);
-        // rigid.AddForce(dir, ForceMode.Force);
-        rigid.velocity = dir;
-
+        rigid.AddForce(dir, ForceMode.Force);
     }
 
+    // TODO : MOVE VAR
+    // TODO : If you accel in one direction and try to spin the other direction, the acceleration factor is still at 1
     private float accelerationFactor = 0;
-
     void RotationNormal() {
         rigid.maxAngularVelocity = stats.maxAngularVelocity;
         rigid.angularDrag = stats.angularDrag;
@@ -145,21 +141,42 @@ public class StatesManager : MonoBehaviour
         // To simulate acceleration
         if (Input.GetAxis("HorizontalR") != 0) {
             accelerationFactor += stats.rotationAccelerationSpeed;
-
+            // Rotation
             rigid.AddTorque(Vector3.up * Mathf.Lerp(0, stats.torque, accelerationFactor) * Mathf.Sign(Input.GetAxis("HorizontalR")), ForceMode.Force);
+            // Upward force
             rigid.AddForce(Vector3.up * Mathf.Lerp(0, stats.rotationUpForce, accelerationFactor), ForceMode.Force);
         }
         else {
-            accelerationFactor -= stats.rotationAccelerationSpeed;
+            accelerationFactor -= stats.rotationAccelerationSpeed * 1.5f;
         }
 
         accelerationFactor = Mathf.Clamp01(accelerationFactor);
     }
 
+    [Header("Hoaver params")]
+    public float hoverRayDistance = 1.4f;
+    public float hoverDistance = 1f;
+    public float restingHeight = 1.5f;
+    public float hoverDamping = 1f;
+    public Transform[] raysPositions;
 
+    void Hovering() {
+        Vector3 origin = tTransform.position;
+        Vector3 dir = Vector3.down;
+        RaycastHit hit;
 
-    void MovementAiming() {
+        for (int i = 0; i < raysPositions.Length; i++) {
+            Debug.DrawRay(raysPositions[i].position, dir * hoverRayDistance, Color.red);
 
+            if (Physics.Raycast(raysPositions[i].position, dir, out hit, hoverRayDistance, ignoreForGround)) {
+                hoverDistance = hit.distance;
+
+                float hoverForce = ((hoverDistance - restingHeight) / Time.deltaTime) * (-0.2f * (restingHeight - hoverDistance));
+                hoverForce -= hoverDamping * rigid.velocity.y;
+
+                rigid.AddForceAtPosition(Vector3.up * hoverForce, raysPositions[i].position, ForceMode.Force);
+            }
+        }
     }
 
     bool OnGround() {

@@ -14,7 +14,7 @@ public class DeathZone : MonoBehaviour {
 	}
 
     private void OnTriggerEnter(Collider other) {
-        other.transform.position = spawnPoint.position;
+        other.transform.parent.position= spawnPoint.position;
     }
 
     void Update () {
