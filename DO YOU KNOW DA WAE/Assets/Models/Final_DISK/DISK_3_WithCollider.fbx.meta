@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 12efe6dc74889dd44859fa1169e36e80
-timeCreated: 1518488748
+guid: eb9f050d55bf25a45bbc2b8140d78e30
+timeCreated: 1518509821
 licenseType: Free
 ModelImporter:
   serializedVersion: 22
@@ -51,6 +51,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Light 2
+    second: {fileID: 2100000, guid: f0c647fbc1b17a2478181c1cfd469c0e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Light Background
     second: {fileID: 2100000, guid: 3c02a54cdbec8ed4abf27a63c25f2dc9, type: 2}
   - first:
@@ -67,7 +72,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: No Name
-    second: {fileID: 2100000, guid: f8fb65d11c278df4b845fcb22373eda7, type: 2}
+    second: {fileID: 2100000, guid: f818eb49810c610419acb06c320caba1, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
