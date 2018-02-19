@@ -11,9 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a95d575002f05034d9927148da3653ff, type: 3}
   m_Name: PrototypeStats
   m_EditorClassIdentifier: 
-  moveSpeed: 17
+  moveSpeed: 40
   boostSpeed: 6
-  drag: 0
+  drag: 1
   jumpTrust: 25
   downForce: 250
   torque: 100
@@ -21,3 +21,7 @@ MonoBehaviour:
   angularDrag: 2
   rotationAccelerationSpeed: 0.002
   rotationUpForce: 8.5
+  decelerationFactor: 1.5
+  hoverRayDistance: 1.2
+  restingHeight: 1.2
+  hoverDamping: 1

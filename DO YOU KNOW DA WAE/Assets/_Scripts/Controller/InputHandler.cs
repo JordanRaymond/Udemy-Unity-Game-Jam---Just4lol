@@ -5,7 +5,8 @@ using UnityEngine;
 public class InputHandler : MonoBehaviour
 {
     public StatesManager states;
-    public Transform camHolder;
+    private CameraManager camManager;
+    private Transform camHolder;
 
     float horizontal;
     float vertical;
@@ -21,11 +22,16 @@ public class InputHandler : MonoBehaviour
     float delta;
 
     void Start() {
+        camManager = CameraManager.singleton;
         InitInGame();
     }
 
     public void InitInGame() {
         states.Init();
+        camManager.Init(transform);
+
+        camHolder = camManager.cameraTransform;
+
         isInit = true;
     }
 
@@ -37,6 +43,8 @@ public class InputHandler : MonoBehaviour
         InGame_UpdateStates_FixedUpdate();
 
         states.FixedTick(delta);
+        camManager.FixedTick(delta);
+
     }
 
     void Update() {
@@ -53,7 +61,6 @@ public class InputHandler : MonoBehaviour
         vertical = Input.GetAxis("Vertical");
         horizontal =  Input.GetAxis("Horizontal");
 
-       
     }
 
     void InGame_UpdateStates_FixedUpdate() {
