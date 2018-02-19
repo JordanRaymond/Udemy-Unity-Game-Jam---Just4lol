@@ -42,8 +42,6 @@ public class StatesManager : MonoBehaviour
 
     public float delta;
 
-    private Material extMatRing;
-
     public void Init() {
         tTransform = transform;
 
@@ -58,9 +56,9 @@ public class StatesManager : MonoBehaviour
 
         ignoreLayers = ~(1 << 9);
         ignoreForGround = ~(1 << 9 | 1 << 10);
-
-        extMatRing = GetExternalRingMaterial();
     }
+
+    public Vector3 rotateForcePoint;
 
     public void FixedTick(float p_delta) {
         delta = p_delta;
@@ -114,8 +112,6 @@ public class StatesManager : MonoBehaviour
             default:
                 break;
         }
-
-        ColorLerp();
     }
 
     // Need a rework so it can work with the wipout controlls
@@ -124,8 +120,6 @@ public class StatesManager : MonoBehaviour
     }
 
     void MovementNormal() {
-        rigid.drag = stats.drag;
-
         // TODO : Acceleration?
         float speed = stats.moveSpeed;
         if (controllerStates.isRunning) {
@@ -138,33 +132,32 @@ public class StatesManager : MonoBehaviour
     }
 
     // TODO : MOVE VAR
-    // TODO : If you accel in one direction and try to spin the other direction, the acceleration factor is still at 
+    // TODO : If you accel in one direction and try to spin the other direction, the acceleration factor is still at 1
     private float accelerationFactor = 0;
-    private int sign = 1;
     void RotationNormal() {
         rigid.maxAngularVelocity = stats.maxAngularVelocity;
         rigid.angularDrag = stats.angularDrag;
 
         // To simulate acceleration
-        if (Input.GetButton("FireL") || Input.GetButton("FireR")) {
-            sign = Input.GetButton("FireL") ? 1 : -1;
-
-            accelerationFactor += (stats.rotationAccelerationSpeed * sign);
-            Debug.Log(accelerationFactor);
+        if (Input.GetAxis("HorizontalR") != 0) {
+            accelerationFactor += stats.rotationAccelerationSpeed;
             // Rotation
-            rigid.AddTorque(Vector3.up * Mathf.Lerp(0, stats.torque, Mathf.Abs(accelerationFactor)) * sign, ForceMode.Force);
+            rigid.AddTorque(Vector3.up * Mathf.Lerp(0, stats.torque, accelerationFactor) * Mathf.Sign(Input.GetAxis("HorizontalR")), ForceMode.Force);
             // Upward force
-            rigid.AddForce(Vector3.up * Mathf.Lerp(0, stats.rotationUpForce, Mathf.Abs(accelerationFactor)), ForceMode.Force);
+            rigid.AddForce(Vector3.up * Mathf.Lerp(0, stats.rotationUpForce, accelerationFactor), ForceMode.Force);
         }
         else {
-            float deceleration = stats.decelerationFactor * (accelerationFactor >= 0 ? -1 : 1);
-            accelerationFactor += stats.rotationAccelerationSpeed * deceleration;
+            accelerationFactor -= stats.rotationAccelerationSpeed * 1.5f;
         }
 
-        accelerationFactor = Mathf.Clamp(accelerationFactor, -1, 1);
+        accelerationFactor = Mathf.Clamp01(accelerationFactor);
     }
 
-
+    [Header("Hoaver params")]
+    public float hoverRayDistance = 1.4f;
+    public float hoverDistance = 1f;
+    public float restingHeight = 1.5f;
+    public float hoverDamping = 1f;
     public Transform[] raysPositions;
 
     void Hovering() {
@@ -173,36 +166,17 @@ public class StatesManager : MonoBehaviour
         RaycastHit hit;
 
         for (int i = 0; i < raysPositions.Length; i++) {
-            Debug.DrawRay(raysPositions[i].position, dir * stats.hoverRayDistance, Color.red);
+            Debug.DrawRay(raysPositions[i].position, dir * hoverRayDistance, Color.red);
 
-            if (Physics.Raycast(raysPositions[i].position, dir, out hit, stats.hoverRayDistance, ignoreForGround)) {
-                float hoverDistance = hit.distance;
+            if (Physics.Raycast(raysPositions[i].position, dir, out hit, hoverRayDistance, ignoreForGround)) {
+                hoverDistance = hit.distance;
 
-                float hoverForce = ((hoverDistance - stats.restingHeight) / Time.deltaTime) * (-0.2f * (stats.restingHeight - hoverDistance));
-                hoverForce -= stats.hoverDamping * rigid.velocity.y;
+                float hoverForce = ((hoverDistance - restingHeight) / Time.deltaTime) * (-0.2f * (restingHeight - hoverDistance));
+                hoverForce -= hoverDamping * rigid.velocity.y;
 
                 rigid.AddForceAtPosition(Vector3.up * hoverForce, raysPositions[i].position, ForceMode.Force);
             }
         }
-    }
-
-    private Material GetExternalRingMaterial() {
-        Renderer rend = GetComponentInChildren<Renderer>();
-        Material[] mats = rend.materials;
-
-        for (int i = 0; i < mats.Length; i++) {
-            if (mats[i].name == "Light 2 (Instance)") {
-                return mats[i];
-            }
-        }
-
-        return rend.material;
-    }
-
-    public Color color1;
-    public Color color2;
-    void ColorLerp() {
-      extMatRing.SetColor("_EmissionColor", Color.Lerp(color1, color2, Mathf.PingPong(Time.time, 1)));
     }
 
     bool OnGround() {

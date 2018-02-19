@@ -1,55 +1,11 @@
 fileFormatVersion: 2
-guid: 07213fc8391496f45ae04d0933f3a71e
-timeCreated: 1518578017
+guid: 266024c8f6395b74aa0a23f764e03f6e
+timeCreated: 1517811612
 licenseType: Free
 ModelImporter:
   serializedVersion: 22
-  fileIDToRecycleName:
-    100000: BezierCurve
-    100002: BezierCurve.001
-    100004: Camera
-    100006: Camera.001
-    100008: Plane
-    100010: Plane.001
-    100012: Sun
-    100014: Sun.001
-    100016: //RootNode
-    400000: BezierCurve
-    400002: BezierCurve.001
-    400004: Camera
-    400006: Camera.001
-    400008: Plane
-    400010: Plane.001
-    400012: Sun
-    400014: Sun.001
-    400016: //RootNode
-    2000000: Camera
-    2000002: Camera.001
-    2300000: BezierCurve
-    2300002: BezierCurve.001
-    2300004: Plane
-    2300006: Plane.001
-    3300000: BezierCurve
-    3300002: BezierCurve.001
-    3300004: Plane
-    3300006: Plane.001
-    4300000: Plane.001
-    4300002: BezierCurve.001
-    4300004: BezierCurve
-    4300006: Plane
-    10800000: Sun
-    10800002: Sun.001
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: No Name
-    second: {fileID: 2100000, guid: 45d3b87fbd9bf2b4492546d1ba44e1e8, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Track
-    second: {fileID: 2100000, guid: a82122f0494c39d4ab484374e0b3a4f5, type: 2}
+  fileIDToRecycleName: {}
+  externalObjects: {}
   materials:
     importMaterials: 1
     materialName: 0
@@ -79,7 +35,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 1.5
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     importVisibility: 1
@@ -121,7 +77,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

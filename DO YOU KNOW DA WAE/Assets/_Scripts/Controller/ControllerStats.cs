@@ -17,11 +17,4 @@ public class ControllerStats : ScriptableObject
 
     public float rotationAccelerationSpeed = 0.1f;
     public float rotationUpForce = 5f;
-    public float decelerationFactor = 1.5f;
-
-    [Header("Hover params")]
-    public float hoverRayDistance = 1.4f;
-    public float restingHeight = 1.5f;
-    [Tooltip("Damp the vertical velocity ; x * * rigid.velocity.y;")]
-    public float hoverDamping = 1f;
 }
