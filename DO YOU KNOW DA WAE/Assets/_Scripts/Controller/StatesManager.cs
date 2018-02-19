@@ -245,4 +245,3 @@ public class StatesManager : MonoBehaviour
     //    anim.SetFloat("vertical", anim_v, 0.15f, delta);
     //}
 }
-
