@@ -5,10 +5,12 @@ using UnityEngine;
 public class InputHandler : MonoBehaviour
 {
     public StatesManager states;
-    public Transform camHolder;
+    private CameraManager camManager;
+    private Transform camHolder;
 
     float horizontal;
     float vertical;
+    float altitude; //ADDED THIS
 
     bool sprintInput;
     bool shootInput;
@@ -21,11 +23,16 @@ public class InputHandler : MonoBehaviour
     float delta;
 
     void Start() {
+        camManager = CameraManager.singleton;
         InitInGame();
     }
 
     public void InitInGame() {
         states.Init();
+        camManager.Init(transform);
+
+        camHolder = camManager.cameraTransform;
+
         isInit = true;
     }
 
@@ -33,10 +40,11 @@ public class InputHandler : MonoBehaviour
         if (!isInit) return;
 
         delta = Time.fixedDeltaTime;
-        GetInput_FixedUpdate();
         InGame_UpdateStates_FixedUpdate();
 
         states.FixedTick(delta);
+        camManager.FixedTick(delta);
+
     }
 
     void Update() {
@@ -46,25 +54,33 @@ public class InputHandler : MonoBehaviour
 
         states.Tick(delta);
 
+        GetInput();
+
+
         states.controllerStates.IsFliping = Input.GetButton("Jump");
     }
 
-    void GetInput_FixedUpdate() {
+    void GetInput() {
         vertical = Input.GetAxis("Vertical");
-        horizontal =  Input.GetAxis("Horizontal");
-
-       
+        horizontal = Input.GetAxis("Horizontal");
+        altitude = Input.GetAxis("Ascend"); //ADDED THIS
     }
 
     void InGame_UpdateStates_FixedUpdate() {
+        //Record input values - handled every frame by StatesManager
         states.inp.horizontal = horizontal;
         states.inp.vertical = vertical;
-        states.inp.moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical));
+        // states.inp.altitude = altitude; //ADDED THIS
+     
+        states.inp.moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical) + Mathf.Abs(altitude));
+
 
         Vector3 moveDir = camHolder.forward * vertical;
         moveDir.y = 0;
         moveDir += camHolder.right * horizontal;
+        moveDir += Vector3.up * altitude; // ADDED THIS
         moveDir.Normalize();
+
         states.inp.moveDirection = moveDir;
 
     
